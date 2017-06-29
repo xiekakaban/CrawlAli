@@ -1,4 +1,4 @@
-package com.states.Entity;
+package com.states.entity;
 
 import java.util.List;
 
@@ -12,6 +12,8 @@ public class ProductEntity extends AbstractEntity {
     private List<ProductDetailEntity> productDetEntityList;
     private String detail;
     private String content;
+    private String create_time;
+    private String isAdd;
 
 
     public ProductEntity() {

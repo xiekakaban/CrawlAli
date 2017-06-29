@@ -1,12 +1,16 @@
 package com.states.main;
 
+import com.google.common.base.Charsets;
+import com.google.common.base.Strings;
+import com.google.common.io.Files;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.states.Entity.ProductDetailEntity;
-import com.states.Entity.ProductEntity;
-import org.eclipse.jetty.util.ajax.JSON;
+import com.states.entity.ProductDetailEntity;
+import com.states.entity.ProductEntity;
+import com.states.util.Constants;
+import org.apache.http.util.Asserts;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -15,58 +19,117 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 
-import javax.print.Doc;
+import java.io.File;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Created by Administrator on 2017/6/28.
  */
 public class Crawler {
-    private List<String> fetchUrlList;
+    private List<String> fetchUrlList; //also will store Filename
     private Gson gson = new GsonBuilder().serializeNulls().create();
+    private List<String> successUrlList = new ArrayList<>();
+    private List<String> failureUrlList = new ArrayList<>();
+    private List<ProductEntity> productList = new ArrayList<>();
+
     public Crawler() {
+
     }
 
-    public void fetch(){
-        System.setProperty("webdriver.chrome.driver","D:\\Software\\chromedriver.exe");
-        WebDriver chromeDriver = new ChromeDriver();
-        List<String> successUrlList = new ArrayList<>();
-        List<String> failureUrlList = new ArrayList<>();
-        List<ProductEntity> productList = new ArrayList<>();
+    public void clear(){
+        this.successUrlList.clear();
+        this.failureUrlList.clear();
+        this.productList.clear();
+    }
 
-        try {
-            for (String fetchUrl : fetchUrlList) {
+
+    private void getSourceByUrl(WebDriver chromeDriver){
+        for (String fetchUrl : fetchUrlList) {
+            try {
                 chromeDriver.get(fetchUrl);
                 if (chromeDriver instanceof JavascriptExecutor) {
                     JavascriptExecutor js = (JavascriptExecutor) chromeDriver;
                     js.executeScript("var q=document.body.scrollTop=100000");
                     Thread.sleep(5000);
-                    Document doc = Jsoup.parse(chromeDriver.getPageSource());
-                    ProductEntity currentProduct = initProductEntity(doc);
-                    System.out.println(gson.toJson(currentProduct));
-                    if(currentProduct != null){
-                        successUrlList.add(fetchUrl);
-                        productList.add(currentProduct);
-                    }else{
-                        failureUrlList.add(fetchUrl);
-                    }
-                } else {
-                    throw new IllegalStateException("This Exeplorer is not support execute Javascript!");
+                    ProductEntity p = structureProduct(chromeDriver.getPageSource());
+                    p.setUrl(fetchUrl);
+                    Asserts.check(!Strings.isNullOrEmpty(p.getTitle()),"Can not structure Product");
+                    successUrlList.add(fetchUrl);
+                    productList.add(p);
                 }
-                chromeDriver.quit();
+            }catch (Exception e) {
+                failureUrlList.add(fetchUrl);
             }
         }
-        catch (Exception e){
-            e.printStackTrace();
-            System.out.println("Can`t fetch url");
-        }finally {
-            chromeDriver.quit();
+    }
+
+
+    private void getSourceByFile(){
+        for (String fetchUrl : fetchUrlList) {
+            try {
+                File f = new File(Constants.currentProjectPath + File.separator + "doc" + File.separator + "data" +File.separator+fetchUrl);
+                Asserts.check(f.isFile(),"Can not found "+fetchUrl);
+                ProductEntity p = structureProduct(Files.toString(f, Charsets.UTF_8));
+                Asserts.check(!Strings.isNullOrEmpty(p.getTitle()),"Can not structure Product");
+                successUrlList.add(fetchUrl);
+                productList.add(p);
+            }catch (Exception e){
+                failureUrlList.add(fetchUrl);
+            }
+
         }
     }
+
+
+    private ProductEntity structureProduct(String sourceHtml){
+        Document doc = Jsoup.parse(sourceHtml);
+        ProductEntity currentProduct = initProductEntity(doc);
+        return currentProduct;
+    }
+
+
+
+    public void fetch(){
+        if(Constants.isLocalTest){
+            getSourceByFile();
+        }else{
+            System.setProperty("webdriver.chrome.driver","D:\\Software\\chromedriver.exe");
+            WebDriver chromeDriver = new ChromeDriver();
+            getSourceByUrl(chromeDriver);
+            chromeDriver.quit();
+        }
+
+    }
+
+    public List<String> getSuccessUrlList() {
+        return successUrlList;
+    }
+
+    public void setSuccessUrlList(List<String> successUrlList) {
+        this.successUrlList = successUrlList;
+    }
+
+    public List<String> getFailureUrlList() {
+        return failureUrlList;
+    }
+
+    public void setFailureUrlList(List<String> failureUrlList) {
+        this.failureUrlList = failureUrlList;
+    }
+
+    public List<ProductEntity> getProductList() {
+        return productList;
+    }
+
+    public void setProductList(List<ProductEntity> productList) {
+        this.productList = productList;
+    }
+
+
 
     private ProductEntity initProductEntity(Document doc){
         ProductEntity p = new ProductEntity();
