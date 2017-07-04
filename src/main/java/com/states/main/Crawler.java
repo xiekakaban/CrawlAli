@@ -7,9 +7,13 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.states.db.ProductDBRunner;
 import com.states.entity.ProductDetailEntity;
 import com.states.entity.ProductEntity;
 import com.states.util.Constants;
+import org.apache.commons.dbutils.BasicRowProcessor;
+import org.apache.commons.dbutils.QueryRunner;
+import org.apache.commons.dbutils.handlers.BeanListHandler;
 import org.apache.http.util.Asserts;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -21,6 +25,7 @@ import org.openqa.selenium.chrome.ChromeDriver;
 
 import java.io.File;
 import java.nio.charset.Charset;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -35,6 +40,7 @@ public class Crawler {
     private List<String> successUrlList = new ArrayList<>();
     private List<String> failureUrlList = new ArrayList<>();
     private List<ProductEntity> productList = new ArrayList<>();
+
 
     public Crawler() {
 
@@ -74,6 +80,7 @@ public class Crawler {
                 File f = new File(Constants.currentProjectPath + File.separator + "doc" + File.separator + "data" +File.separator+fetchUrl);
                 Asserts.check(f.isFile(),"Can not found "+fetchUrl);
                 ProductEntity p = structureProduct(Files.toString(f, Charsets.UTF_8));
+                p.setUrl(fetchUrl);
                 Asserts.check(!Strings.isNullOrEmpty(p.getTitle()),"Can not structure Product");
                 successUrlList.add(fetchUrl);
                 productList.add(p);
@@ -91,6 +98,17 @@ public class Crawler {
         return currentProduct;
     }
 
+    public List<ProductEntity> storeProduct(){
+        ProductDBRunner productDBRunner = new ProductDBRunner();
+        List<ProductEntity> failurList = new ArrayList<>();
+        for(ProductEntity p : productList){
+            if(!productDBRunner.insert(p)){
+                failurList.add(p);
+            }
+        }
+        return failurList;
+    }
+
 
 
     public void fetch(){
@@ -102,7 +120,6 @@ public class Crawler {
             getSourceByUrl(chromeDriver);
             chromeDriver.quit();
         }
-
     }
 
     public List<String> getSuccessUrlList() {
