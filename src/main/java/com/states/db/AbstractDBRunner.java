@@ -1,5 +1,7 @@
 package com.states.db;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.apache.commons.dbutils.BeanProcessor;
 import org.apache.commons.dbutils.QueryRunner;
 
@@ -10,6 +12,7 @@ import java.util.Map;
  */
 public class AbstractDBRunner<T>{
 
+    protected Gson gson = new GsonBuilder().create();
     protected  BeanProcessor processor = new BeanProcessor();
 
     public AbstractDBRunner(){

@@ -10,7 +10,7 @@ public class ProductEntity extends AbstractEntity {
     private String title;
     private String url;
     private String picList;
-    private List<ProductDetailEntity> productDetEntityList;
+    private String productDetEntityList;
     private String detail;
     private String content;
     private String createTime;
@@ -52,11 +52,11 @@ public class ProductEntity extends AbstractEntity {
         this.picList = picList;
     }
 
-    public List<ProductDetailEntity> getProductDetEntityList() {
+    public String getProductDetEntityList() {
         return productDetEntityList;
     }
 
-    public void setProductDetEntityList(List<ProductDetailEntity> productDetEntityList) {
+    public void setProductDetEntityList(String productDetEntityList) {
         this.productDetEntityList = productDetEntityList;
     }
 

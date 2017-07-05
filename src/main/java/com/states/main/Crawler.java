@@ -157,7 +157,7 @@ public class Crawler {
         p.setProductDetEntityList(getProductSaleInfo(doc));
         return p;
     }
-    private List<ProductDetailEntity> getProductSaleInfo(Document doc){
+    private String getProductSaleInfo(Document doc){
         List<ProductDetailEntity> prodDetList = new ArrayList<>();
         Elements proDetEles = doc.select("table.table-sku tr[data-sku-config]");
         JsonParser jParser = new JsonParser();
@@ -174,7 +174,7 @@ public class Crawler {
             productDetailEntity.setCount(e.select("td.count").first().text());
             prodDetList.add(productDetailEntity);
         }
-        return prodDetList;
+        return gson.toJson(prodDetList);
     }
     private String getProductContent(Document doc){
         return doc.select("div#desc-lazyload-container").first().html();
@@ -210,7 +210,6 @@ public class Crawler {
         }
         return gson.toJson(picListResult);
     }
-
 
     public List<String> getFetchUrlList() {
         return fetchUrlList;
