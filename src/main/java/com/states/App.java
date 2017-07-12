@@ -4,6 +4,7 @@ import com.states.db.ProductDBRunner;
 import com.states.db.SQLiteDBUtil;
 import com.states.entity.ProductEntity;
 import com.states.main.Crawler;
+import com.states.main.FXMLGUIFaceController;
 import com.states.main.GUIFace;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.ArrayListHandler;
@@ -24,9 +25,10 @@ public class App
     public static void main( String[] args )
     {
 
-        GUIFace guiFace = new GUIFace();
-        guiFace.initAndShow();
-
+        //GUIFace guiFace = new GUIFace();
+        //guiFace.initAndShow();
+        FXMLGUIFaceController fxmlguiFaceController = new FXMLGUIFaceController();
+        fxmlguiFaceController.initAndShow();
 //        Crawler crawler = new Crawler();
         //crawler.setFetchUrlList(Arrays.asList("https://detail.1688.com/offer/536685049415.html?spm=a2615.2177701.0.0.VqHpf2"));
 //        crawler.setFetchUrlList(Arrays.asList("chopsticks.html"));
