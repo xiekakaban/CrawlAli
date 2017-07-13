@@ -47,17 +47,7 @@ public class ProductDBRunner extends AbstractDBRunner<ProductEntity>{
         public ProductEntity getProductById(String id){
             return null;
         }
-        public List<ProductEntity> getAllProduct(){
-            try{
-               QueryRunner queryRunner = new QueryRunner();
-                RowProcessor rowProcessor = new BasicRowProcessor(this.processor);
-                List<ProductEntity> productEntityList = queryRunner.query(SQLiteDBUtil.getDataSource().getConnection(),"select * from ali_prod", new BeanListHandler<ProductEntity>(ProductEntity.class, rowProcessor));
-                return productEntityList;
-            }catch (Exception ex) {
-                ex.printStackTrace();
-                return null;
-            }
-        }
+
 
     public Boolean changeAdd(ProductEntity p){
         try {
@@ -73,11 +63,23 @@ public class ProductDBRunner extends AbstractDBRunner<ProductEntity>{
         return true;
     }
 
-    public List<ProductEntity> getProdNameList(){
+    public List<ProductEntity> getProdList(){
         try{
             QueryRunner queryRunner = new QueryRunner();
             RowProcessor rowProcessor = new BasicRowProcessor(this.processor);
-            List<ProductEntity> productNames = queryRunner.query(SQLiteDBUtil.getDataSource().getConnection(),"select id,title,isAdd from ali_prod",  new BeanListHandler<ProductEntity>(ProductEntity.class, rowProcessor));
+            List<ProductEntity> productNames = queryRunner.query(SQLiteDBUtil.getDataSource().getConnection(),"select * from ali_prod order by create_time",  new BeanListHandler<ProductEntity>(ProductEntity.class, rowProcessor));
+            return productNames;
+        }catch (Exception ex) {
+            ex.printStackTrace();
+            return null;
+        }
+    }
+
+    public List<ProductEntity> getProdListSeg(int start, int end){
+        try{
+            QueryRunner queryRunner = new QueryRunner();
+            RowProcessor rowProcessor = new BasicRowProcessor(this.processor);
+            List<ProductEntity> productNames = queryRunner.query(SQLiteDBUtil.getDataSource().getConnection(),"select * from ali_prod  by create_time limit "+start+","+end,  new BeanListHandler<ProductEntity>(ProductEntity.class, rowProcessor));
             return productNames;
         }catch (Exception ex) {
             ex.printStackTrace();

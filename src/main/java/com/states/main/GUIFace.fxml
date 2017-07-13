@@ -19,7 +19,7 @@
       </HBox>
    </bottom>
    <right>
-      <ListView prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
+      <ListView fx:id="prodListDisplay" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
    </right>
    <center>
       <GridPane hgap="10.0" vgap="10.0" BorderPane.alignment="CENTER">
@@ -41,7 +41,7 @@
                   <Insets />
                </GridPane.margin>
             </Label>
-            <Label id="titleDispaly" fx:id="titleDispaly" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Label" GridPane.columnIndex="1">
+            <Label fx:id="titleDisplay" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Label" GridPane.columnIndex="1">
                <GridPane.margin>
                   <Insets />
                </GridPane.margin>
